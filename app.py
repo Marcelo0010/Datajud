@@ -11,6 +11,8 @@ HEADERS = {
     "Content-Type": "application/json",
     "Authorization": API_KEY
 }
+# Aqui você pode definir o tamanho da página e o número máximo de documentos por estado
+# para evitar sobrecarga na coleta de dados
 PAGE_SIZE = 10000
 MAX_DOCS_PER_STATE = 1000
 
@@ -155,15 +157,27 @@ fig3 = px.bar(
 )
 st.plotly_chart(fig3, use_container_width=True)
 
-# 4.4 Série mensal de ajuizamento
-st.subheader("Processos por Mês de Ajuizamento")
+# 4.4 Série mensal de ajuizamento por estado
+st.subheader("Processos por Mês de Ajuizamento (por Estado)")
 df['mes_ajuiz'] = df['dataAjuizamento'].dt.to_period('M').astype(str)
-serie = df.groupby('mes_ajuiz').size().reset_index(name='quantidade')
-fig4 = px.line(
-    serie, x='mes_ajuiz', y='quantidade', markers=True,
-    title="Processos ajuizados por mês"
+
+serie_estados = (
+    df.groupby(['mes_ajuiz', 'estado'])
+      .size()
+      .reset_index(name='quantidade')
 )
+
+fig4 = px.line(
+    serie_estados,
+    x='mes_ajuiz',
+    y='quantidade',
+    color='estado',
+    markers=True,
+    title="Processos ajuizados por mês (por Estado)"
+)
+fig4.update_layout(xaxis_title="Mês", yaxis_title="Quantidade de Processos")
 st.plotly_chart(fig4, use_container_width=True)
 
 # 4.5 Última atualização do dashboard
 st.markdown(f"*Dados coletados até:* {df['dataHoraUltimaAtualizacao'].max()}")
+
