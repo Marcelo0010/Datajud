@@ -11,7 +11,7 @@ Este repositório demonstra duas abordagens para explorar a **API pública DataJ
 
 ## 2. Dashboard Interativo com Streamlit + Pandas
 
-* Coleta dinâmica com cache (`@st.cache_data`) para “quase real-time”.
+* Coleta dinâmica com cache (`@st.cache_data`) para “bom para dados quase real-time”.
 * Filtros por estado, visualização de Top 20 Assuntos, Duração Média, Movimentações Médias e Séries Temporais.
 * Fácil de compartilhar com equipes ou publicar resultados em relatórios.
 
@@ -19,11 +19,11 @@ Este repositório demonstra duas abordagens para explorar a **API pública DataJ
 
 A API pública **DataJud**, mantida pelo Conselho Nacional de Justiça (CNJ), disponibiliza **metadados processuais** de tribunais estaduais de forma aberta:
 
-* **Estrutura RESTful** com endpoints para cada tribunal, seguindo `api_publica_<sigla>/_search`.
+* **Estrutura RESTful** com endpoints para cada tribunal, seguindo `https://api-publica.datajud.cnj.jus.br/api_publica_<sigla>/_search`. 
 * **Filtros** por campos como `dataAjuizamento`, `classe`, `assuntos`, `grau`.
 * **Paginação via scroll** para percorrer toda a base.
 
-**Observação**: há uma **defasagem** na atualização dos dados (em geral algumas horas), pois a API sincroniza periodicamente com os sistemas internos dos tribunais.
+**Observação**: há uma **defasagem** na atualização dos dados (em geral algumas dias), pois a API sincroniza periodicamente com os sistemas internos dos tribunais.
 
 ## O que é o Apache Spark?
 
