@@ -1,69 +1,80 @@
+# DataJud Analytics
 
-# DataJud Spark Analysis
+Este repositório demonstra duas abordagens para explorar a **API pública DataJud** do CNJ:
 
-Este repositório apresenta um **pipeline de análise de processos judiciais** utilizando dados do **DataJud** (API pública do Conselho Nacional de Justiça) para os Tribunais de Justiça da Paraíba (PB), Pernambuco (PE) e Rio Grande do Norte (RN).
+## 1. Processamento em Larga Escala com Apache Spark
 
-## Sobre o DataJud
+* Consulta *range* por data (janeiro/2024 até hoje) e paginação via *scroll*.
+* Coleta de centenas de milhares de processos de PB, PE e RN sem estourar memória local.
+* Transformação em DataFrame Spark, com cálculo de métricas: duração média dos processos, contagem por classe, assunto, juízo e estado.
+* Geração de tabelas e gráficos estáticos via Plotly para análise offline.
 
-O DataJud é uma iniciativa do CNJ que fornece acesso aberto a informações processuais de diversos tribunais brasileiros. A API pública do DataJud permite consultar **metadados de processos** (classe, assunto, juízo, movimentações, datas de ajuizamento e atualização, etc.), possibilitando análises agregadas e também estudos de eficiência e desempenho dos tribunais.
+## 2. Dashboard Interativo com Streamlit + Pandas
 
-## Objetivos deste projeto
+* Coleta dinâmica com cache (`@st.cache_data`) para “quase real-time”.
+* Filtros por estado, visualização de Top 20 Assuntos, Duração Média, Movimentações Médias e Séries Temporais.
+* Fácil de compartilhar com equipes ou publicar resultados em relatórios.
 
-1. **Quantificar** o volume de casos ajuizados de janeiro/2024 até o presente.
-2. **Comparar** a distribuição de assuntos e classes processuais entre PB, PE e RN.
-3. **Avaliar a eficiência** dos juízos por meio da duração média dos processos.
-4. **Visualizar** padrões temporais (mensal, horário) e características estruturais (grau, movimentações).
+## Sobre a API DataJud
 
-## Estrutura
+A API DataJud disponibiliza metadados processuais de tribunais estaduais (classe, assunto, juízo, datas, movimentações), permitindo:
 
-* **analysis.py**
-  Script principal em PySpark que:
+* **Match all** ou **range queries** por campo de data (`dataAjuizamento`).
+* **Scroll pagination** para percorrer toda a base.
+* Filtragem em campos como sistema, formato e grau.
 
-  * Coleta e limpa dados via API DataJud (scroll + *range* em `dataAjuizamento`).
-  * Transforma registros em DataFrame Spark e calcula métricas (duração, contagens).
-  * Gera tabelas Spark e exporta para gráficos com Plotly.
+Economistas, cientistas de dados e gestores públicos podem usar esses dados para:
 
-* **requirements.txt**
-  Lista de dependências para instalar via pip.
+* Avaliar **eficiência** dos tribunais (duração média, número de movimentações).
+* Identificar **tendências de litígio** (assuntos e classes dominantes).
+* Monitorar **fluxo de casos** ao longo do tempo.
 
-## Como executar
+## Estrutura do Repositório
 
-1. Clone o repositório:
+* **analysis.py**: pipeline PySpark para coleta e análise offline.
+* **app.py**: dashboard Streamlit para interação em tempo quase real.
+* **requirements.txt**: dependências necessárias.
+
+## Como Executar
+
+### Análise em Spark
+
+1. Instale dependências:
 
    ```bash
-   git clone <URL_DO_REPO>
-   cd datajud-spark-analysis
-   ```
-2. Crie um ambiente virtual e instale as dependências:
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # ou `venv\Scripts\activate` no Windows
    pip install -r requirements.txt
    ```
-3. Ajuste a variável `API_KEY` em `analysis.py` (substitua pela sua chave se necessário).
-4. Execute com Spark:
+2. Execute:
 
    ```bash
    spark-submit analysis.py
    ```
 
-   ou, em um notebook:
+### Dashboard Streamlit
+
+1. Instale dependências (se ainda não instalou):
 
    ```bash
-   python analysis.py
+   pip install -r requirements.txt
    ```
+2. Rode:
 
-## Principais Insights
+   ```bash
+   streamlit run app.py
+   ```
+3. Abra a URL exibida no terminal.
 
-* **Processos por Estado**: mostra o volume real de casos (muito abaixo dos limites solicitados), refletindo o fluxo de janeiro/2024 até hoje.
-* **Top 10 Assuntos por Estado**: facetas destacam as áreas de litígio predominantes em cada tribunal.
-* **Classes Processuais**: comparação das classes que superaram 50 processos em cada jurisdição.
-* **Duração Média**: indicador de eficiência, revelando quais juízos finalizam mais rapidamente.
+## Por que usar estas ferramentas?
 
-## Próximos passos
+* **Desempenho**: Spark processa grandes volumes sem overcommit de RAM.
+* **Velocidade**: filtros na API e cache no Streamlit mantêm a análise responsiva.
+* **Flexibilidade**: combine análises offline e dashboards interativos com o mesmo fluxo de dados.
+* **Reprodutibilidade**: basta ajustar a `API_KEY` para replicar em qualquer máquina.
 
-* **Escalar** para outros tribunais estaduais e federais.
+---
+
+*Exploração de dados judiciais em Spark e Streamlit — insights para áreas de economia do crime, políticas públicas e gestão judicial.*
+
 * **Análises temporais mais refinadas** (tendências semanais, sazonalidade).
 * **Modelagem preditiva** para estimar prazos de julgamento.
 
