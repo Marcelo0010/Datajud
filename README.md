@@ -15,21 +15,32 @@ Este repositório demonstra duas abordagens para explorar a **API pública DataJ
 * Filtros por estado, visualização de Top 20 Assuntos, Duração Média, Movimentações Médias e Séries Temporais.
 * Fácil de compartilhar com equipes ou publicar resultados em relatórios.
 
-## Sobre a API DataJud
+## O que é a API DataJud?
 
-A API DataJud disponibiliza metadados processuais de tribunais estaduais (classe, assunto, juízo, datas, movimentações), permitindo:
+A API pública **DataJud**, mantida pelo Conselho Nacional de Justiça (CNJ), disponibiliza **metadados processuais** de tribunais estaduais de forma aberta:
 
-* **Match all** ou **range queries** por campo de data (`dataAjuizamento`).
-* **Scroll pagination** para percorrer toda a base.
-* Filtragem em campos como sistema, formato e grau.
+* **Estrutura RESTful** com endpoints para cada tribunal, seguindo `api_publica_<sigla>/_search`.
+* **Filtros** por campos como `dataAjuizamento`, `classe`, `assuntos`, `grau`.
+* **Paginação via scroll** para percorrer toda a base.
 
-Economistas, cientistas de dados e gestores públicos podem usar esses dados para:
+**Observação**: há uma **defasagem** na atualização dos dados (em geral algumas horas), pois a API sincroniza periodicamente com os sistemas internos dos tribunais.
 
-* Avaliar **eficiência** dos tribunais (duração média, número de movimentações).
-* Identificar **tendências de litígio** (assuntos e classes dominantes).
-* Monitorar **fluxo de casos** ao longo do tempo.
+## O que é o Apache Spark?
 
-## Estrutura do Repositório
+[Apache Spark](https://spark.apache.org/) é uma **engine de processamento distribuído** projetada para:
+
+* **Processar grandes volumes** de dados em memória sem sobrecarregar recursos locais.
+* Definir **pipelines** de transformação de dados (ETL) de forma declarativa via DataFrame API.
+* Realizar **agregações**, **joindas** e **cálculos estatísticos** de maneira escalável.
+
+No `analysis.py`, usamos Spark para:
+
+1. **Coletar** centenas de milhares de registros da API sem estourar memória.
+2. **Filtrar** por intervalo de datas no próprio cluster.
+3. **Calcular** métricas como duração média, contagens por assunto/classe/estado.
+4. **Exportar** resultados para gráficos estáticos com Plotly.
+
+## Estrutura do Repositório do Repositório
 
 * **analysis.py**: pipeline PySpark para coleta e análise offline.
 * **app.py**: dashboard Streamlit para interação em tempo quase real.
