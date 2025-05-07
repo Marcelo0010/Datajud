@@ -43,7 +43,7 @@ No `analysis.py`, usamos Spark para:
 ## Estrutura do Repositório do Repositório
 
 * **analysis.py**: pipeline PySpark para coleta e análise offline.
-* **app.py**: dashboard Streamlit para interação em tempo quase real.
+* **app.py**: dashboard Streamlit para interação
 * **requirements.txt**: dependências necessárias.
 
 ## Como Executar
@@ -80,15 +80,7 @@ No `analysis.py`, usamos Spark para:
 * **Desempenho**: Spark processa grandes volumes sem overcommit de RAM.
 * **Velocidade**: filtros na API e cache no Streamlit mantêm a análise responsiva.
 * **Flexibilidade**: combine análises offline e dashboards interativos com o mesmo fluxo de dados.
-* **Reprodutibilidade**: basta ajustar a `API_KEY` para replicar em qualquer máquina.
+* **Reprodutibilidade**: basta usar a `API_KEY` para replicar em qualquer máquina.
 
 ---
 
-*Exploração de dados judiciais em Spark e Streamlit — insights para áreas de economia do crime, políticas públicas e gestão judicial.*
-
-* **Análises temporais mais refinadas** (tendências semanais, sazonalidade).
-* **Modelagem preditiva** para estimar prazos de julgamento.
-
----
-
-*Desenvolvido em PySpark e Plotly — insights judiciais para informar gestores, advogados e pesquisadores.*
