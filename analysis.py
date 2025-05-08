@@ -143,89 +143,109 @@ df_ape.cache()
 
 # === 8. VISUALIZAÇÕES PANDAS/Plotly ===
 
-# === 8.1 EFICIÊNCIA JUÍZES ===
-df_eff = df_pro.groupBy("estado","juiz") \
-    .agg(avg("duracao_dias").alias("dur_media"), count("*").alias("n_proc")) \
-    .filter(col("n_proc")>=20) \
-    .orderBy("estado","dur_media")
+# Converte o DataFrame Spark principal para Pandas (será usado em vários gráficos)
+pdf_pro = df_pro.toPandas()
 
-# === 8.2.  VISUALIZAÇÃO EFICIÊNCIA JUÍZES ===
+# 8.1 EFICIÊNCIA DOS JUÍZES
+df_eff = df_pro.groupBy("estado", "juiz") \
+    .agg(
+        avg("duracao_dias").alias("dur_media"),
+        count("*").alias("n_proc")
+    ) \
+    .filter(col("n_proc") >= 20) \
+    .orderBy("estado", "dur_media")
+
 pdf_eff = df_eff.toPandas()
-fig1 = px.bar(pdf_eff, x="dur_media", y="juiz", color="estado", orientation="h",
-              title="Juízes com ≥20 processos: duração média")
+fig1 = px.bar(
+    pdf_eff,
+    x="dur_media",
+    y="juiz",
+    color="estado",
+    orientation="h",
+    title="Juízes com ≥20 processos: duração média"
+)
+fig1.show()
 
+
+# 8.2 TOP ASSUNTOS POR ESTADO
 df_ass_est = df_pro.groupBy("estado", "assunto_principal") \
-                  .count() \
-                  .orderBy("estado", col("count").desc())
+    .count() \
+    .orderBy("estado", col("count").desc())
 
-# converte para pandas
 pdf_ass_est = df_ass_est.toPandas()
-
-
-# === 8.3.  FACETAS: UM SUBPLOT POR ESTADO ===
-fig_ass_est = px.bar(
+fig2 = px.bar(
     pdf_ass_est,
-    x="count", y="assunto_principal",
+    x="count",
+    y="assunto_principal",
     color="assunto_principal",
-    facet_col="estado", facet_col_wrap=3,
-    category_orders={"estado": sorted(df_pro.select("estado").distinct().rdd.flatMap(lambda x: x).collect())},
+    facet_col="estado",
+    facet_col_wrap=3,
+    category_orders={
+        "estado": sorted(df_pro.select("estado").distinct().rdd.flatMap(lambda x: x).collect())
+    },
     title="Top Assuntos por Estado",
     height=400
 )
-fig_ass_est.update_layout(showlegend=False)
-fig_ass_est.show()
+fig2.update_layout(showlegend=False)
+fig2.show()
 
-# === 8.4.  PROCESSOS POR CLASSE E ESTADO (TOP 10 CLASSES POR UF)  ===
+
+# 8.3 CLASSES PROCESSUAIS POR ESTADO (TOP >50)
 df_cls_est = df_pro.groupBy("estado", "classe") \
-                  .count() \
-                  .orderBy("estado", col("count").desc()) \
-                  .filter(col("count") > 50)  # filtra por um mínimo para clareza
+    .count() \
+    .filter(col("count") > 50) \
+    .orderBy("estado", col("count").desc())
 
 pdf_cls_est = df_cls_est.toPandas()
-fig_cls_est = px.bar(
+fig3 = px.bar(
     pdf_cls_est,
-    x="count", y="classe",
+    x="count",
+    y="classe",
     color="estado",
-    facet_col="estado", facet_col_wrap=3,
+    facet_col="estado",
+    facet_col_wrap=3,
     title="Classes Processuais (>50 processos) por Estado",
     height=800
 )
-fig_cls_est.update_layout(showlegend=False)
-fig_cls_est.show()
+fig3.update_layout(showlegend=False)
+fig3.show()
 
-# === 8.5.  HISTOGRAMA DIAS POR PROCESSOS EM CADA ESTADO  ===
 
-fig_hist_est = px.histogram(
+# 8.4 HISTOGRAMA DA DURAÇÃO DOS PROCESSOS POR ESTADO
+fig4 = px.histogram(
     pdf_pro,
     x="duracao_dias",
     facet_col="estado",
-    facet_col_wrap=3,       # 3 colunas de facetas para organização
+    facet_col_wrap=3,
     nbins=50,
     title="Distribuição da Duração dos Processos (dias) por Estado",
-    labels={"duracao_dias":"Duração (dias)", "count":"Número de Processos"}
+    labels={"duracao_dias": "Duração (dias)", "count": "Número de Processos"}
 )
-# Ajustes estéticos
-fig_hist_est.update_layout(
+fig4.update_layout(
     height=1000,
     showlegend=False
 )
-# Opcional: alinhamento dos eixos x para todas as facetas
-fig_hist_est.for_each_xaxis(lambda ax: ax.update(matches=None))  
-# (remova se quiser eixos x compartilhados)
+# Desacopla eixos X para cada faceta
+fig4.for_each_xaxis(lambda ax: ax.update(matches=None))
+fig4.show()
 
-fig_hist_est.show()
 
-# === 8.5.  GRAU POR ESTADO  ===
+# 8.5 QUANTIDADE DE PROCESSOS POR GRAU E ESTADO
+df_grau_est = df_pro.groupBy("estado", "grau") \
+    .count() \
+    .orderBy("estado", col("count").desc())
 
-df_grau_est = df_pro.groupBy("estado","grau").count().orderBy("estado","count")
 pdf_grau_est = df_grau_est.toPandas()
-fig_grau = px.bar(
+fig5 = px.bar(
     pdf_grau_est,
-    x="grau", y="count", color="estado",
+    x="grau",
+    y="count",
+    color="estado",
     barmode="group",
     title="Quantidade de Processos por Grau e Estado"
 )
-fig_grau.show()
+fig5.show()
+
 
 # === 9. TABELAS RESUMO ===
 
